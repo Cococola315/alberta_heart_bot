@@ -1,5 +1,5 @@
 # alberta_heart_bot
-Discord bot for the UofA Alberta Heart Student Group
+Discord bot for the UofA Alberta Heart student group
 
 
 Steps:
