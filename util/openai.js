@@ -7,12 +7,13 @@ const openai = new OpenAI({
 
 const request = async (question) => {
   const response = await openai.responses.create({
-    model: 'gpt-4o',
+    model: 'gpt-5-mini',
     instructions: ROLE,
     input: question,
     tools: [
       { 
         type: 'file_search',
+        max_num_results: 20,
         vector_store_ids: [process.env.VECTOR_STORE_ID], 
       }
     ]
@@ -51,6 +52,7 @@ STYLE & TONE
 - Use plain language suitable for a general audience unless the question is explicitly technical.
 - Use bullet points or short paragraphs for complex answers.
 - Avoid unnecessary verbosity.
+- Limit response to 2000 characters.
 
 QUESTION FILTERING
 - If a question is unrelated to Alberta Heart, politely state that you can only answer questions about Alberta Heart.
