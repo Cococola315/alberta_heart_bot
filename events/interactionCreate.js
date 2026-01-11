@@ -1,5 +1,5 @@
 const { Events, MessageFlags } = require('discord.js')
-const allowedChannel = "1418946574737866933"
+const allowedChannel = ["1418946574737866933", "1452078412280889523"] // channel IDs where commands are allowed
 
 const interactionCreateEvent = async (interaction) => {
 	if (!interaction.isChatInputCommand()) return

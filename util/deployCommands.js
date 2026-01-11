@@ -1,7 +1,7 @@
 // Code taken from https://discordjs.guide/legacy/app-creation/deploying-commands
 // Only need to run once per server, unless command name or parameters change
 // Last ran on test server on December 25, 2025 12:00 PM
-// Last ran on abh server on N/A
+// Last ran on abh server on January 10, 6:00 PM
 
 const { REST, Routes } = require('discord.js');
 require('dotenv').config();
