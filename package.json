@@ -16,7 +16,13 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "eslint .",
+    "format": "eslint --fix .",
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "**/*.js": "eslint --fix"
   },
   "dependencies": {
     "discord.js": "^14.25.1",
@@ -29,6 +35,8 @@
     "@eslint/js": "^9.39.2",
     "eslint": "^9.39.2",
     "globals": "^16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.3",
     "mammoth": "^1.11.0",
     "pdf-parse": "^2.4.5"
   }
