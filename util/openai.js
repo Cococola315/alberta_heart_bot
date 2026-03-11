@@ -3,7 +3,7 @@ const { OpenAI } = require('openai');
 
 const openai = new OpenAI({
   apiKey: process.env.CHATGPT_API_KEY,
-})
+});
 
 const request = async (question) => {
   const response = await openai.responses.create({
@@ -17,10 +17,10 @@ const request = async (question) => {
         vector_store_ids: [process.env.VECTOR_STORE_ID], 
       }
     ]
-  })
+  });
 
-  return response
-}
+  return response;
+};
 
 const ROLE = `
 You are an expert, careful, and transparent assistant for Alberta Heart (ABH).
@@ -71,8 +71,8 @@ OUTPUT REQUIREMENTS
 
 GOAL
 - Provide accurate, grounded, and trustworthy answers about Alberta Heart based strictly on the supplied document content.
-`
+`;
 
 module.exports = {
   request
-}
+};

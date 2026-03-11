@@ -1,47 +1,47 @@
 // This script was last ran on 2025-12-26
 
-require('dotenv').config()
-const { OpenAI } = require('openai')
+require('dotenv').config();
+const { OpenAI } = require('openai');
 const { google } = require('googleapis');
-const fs = require('node:fs')
-const path = require('node:path')
-const crypto = require('node:crypto')
-const auth = require('./googleAuth')
+const fs = require('node:fs');
+const path = require('node:path');
+const crypto = require('node:crypto');
+const auth = require('./googleAuth');
 const { finished } = require('stream/promises');
 const pLimit = require('p-limit');
-const { PDFParse } = require('pdf-parse')
-const mammoth = require('mammoth')
+const { PDFParse } = require('pdf-parse');
+const mammoth = require('mammoth');
 
 const limit = pLimit.default ? pLimit.default(10) : pLimit(10);
 
 const openai = new OpenAI({
   apiKey: process.env.CHATGPT_API_KEY,
-})
+});
 
-const FOLDER_ID = '1yXiOs1Gup1NeDQg9FbJqUG_jJPWLL22I' // google drive folder id
+const FOLDER_ID = '1yXiOs1Gup1NeDQg9FbJqUG_jJPWLL22I'; // google drive folder id
 
 // deletes file after upload
 const deleteFile = async (fileName) => {
   try {
-    await fs.promises.unlink(fileName)
-    console.log(`Deleted file: ${fileName}`)
+    await fs.promises.unlink(fileName);
+    console.log(`Deleted file: ${fileName}`);
   } catch (err) {
-    console.error(`Error deleting file ${fileName}:`, err)
+    console.error(`Error deleting file ${fileName}:`, err);
   }
-}
+};
 
 // upload file to vector store
 const uploadToVectorStore = async (jsonFileName) => {
   const file = await openai.files.create({
     file: fs.createReadStream(jsonFileName),
     purpose: 'assistants',
-  })
+  });
 
   await openai.vectorStores.files.create(
     process.env.VECTOR_STORE_ID,
     { file_id: file.id }
-  )
-}
+  );
+};
 
 // creates a json file 
 const createJsonFile = async (data, metadata) => {
@@ -49,32 +49,32 @@ const createJsonFile = async (data, metadata) => {
   const jsonContent = {
     ...metadata,
     content: data
-  }
-  const jsonString = JSON.stringify(jsonContent)
+  };
+  const jsonString = JSON.stringify(jsonContent);
   // create json file with randomized name (we can actually use more detailed names relating to the file)
-  const filename = `${crypto.randomUUID()}.json`
-  await fs.promises.writeFile(filename, jsonString, 'utf8')
+  const filename = `${crypto.randomUUID()}.json`;
+  await fs.promises.writeFile(filename, jsonString, 'utf8');
 
-  return filename
-}
+  return filename;
+};
 
 // get text out of files since pdfs and docxs are just containers
 // uploads the files to vector store
 // deletes the temporary json file after upload
 const processFilesAndUpload = async (filePath, ext, metaData) => { 
   if (ext === '.pdf') {
-    const dataBuffer = await fs.promises.readFile(filePath)
-    const parser = new PDFParse({ data: dataBuffer })
-    const data = await parser.getText()
-    const jsonFileName = await createJsonFile(data.text, metaData)
-    await uploadToVectorStore(jsonFileName)
-    await deleteFile(jsonFileName)
+    const dataBuffer = await fs.promises.readFile(filePath);
+    const parser = new PDFParse({ data: dataBuffer });
+    const data = await parser.getText();
+    const jsonFileName = await createJsonFile(data.text, metaData);
+    await uploadToVectorStore(jsonFileName);
+    await deleteFile(jsonFileName);
   } 
   else if (ext === '.docx') {
-    const data = await mammoth.extractRawText({ path: filePath })
-    const jsonFileName = await createJsonFile(data.value, metaData)
-    await uploadToVectorStore(jsonFileName)
-    await deleteFile(jsonFileName)
+    const data = await mammoth.extractRawText({ path: filePath });
+    const jsonFileName = await createJsonFile(data.value, metaData);
+    await uploadToVectorStore(jsonFileName);
+    await deleteFile(jsonFileName);
   } 
   else if (ext === '.txt') {
     const data = await fs.promises.readFile(filePath, 'utf8');
@@ -82,12 +82,12 @@ const processFilesAndUpload = async (filePath, ext, metaData) => {
     await uploadToVectorStore(jsonFileName);
     await deleteFile(jsonFileName);
   }
-}
+};
 
 // downloads file, returns the path to the downloaded file, and a randomized name for the file (since google drive files can have duplicate names)
 const downloadFile = async (drive, file) => {
-  const mt = file.mimeType // extensions basically
-  let fileName = `${crypto.randomUUID()}`
+  const mt = file.mimeType; // extensions basically
+  let fileName = `${crypto.randomUUID()}`;
 
   // check extenstion type
   const isPDF = mt === 'application/pdf';
@@ -97,7 +97,7 @@ const downloadFile = async (drive, file) => {
 
   // only process supported file types, otherwise return null
   if (isPDF || isTXT || isWord || isGoogleDoc) {
-  console.log(`Processing ${mt}`);
+    console.log(`Processing ${mt}`);
 
     try {
       if (isPDF) fileName += '.pdf';
@@ -120,7 +120,7 @@ const downloadFile = async (drive, file) => {
 
       // wait for the download to finish
       await finished(destination); 
-      console.log(`Saved ${fileName}`)
+      console.log(`Saved ${fileName}`);
 
       return { fileName: fileName, filePath: destinationPath };
 
@@ -131,7 +131,7 @@ const downloadFile = async (drive, file) => {
   } 
 
   return null; // unsupported file type
-}
+};
 
 // recursively navigate through folders and process files
 const fetchFilesRecursive = async (FOLDER_ID, currentPath = 'root') => {
@@ -153,7 +153,7 @@ const fetchFilesRecursive = async (FOLDER_ID, currentPath = 'root') => {
 
       // if its a folder, then recurse
       if (file.mimeType === 'application/vnd.google-apps.folder') {
-        console.log(`Entering folder: ${relativePath}`)
+        console.log(`Entering folder: ${relativePath}`);
         await fetchFilesRecursive(file.id, relativePath);
       } 
       // if its a file then download, process, and upload to vector store
@@ -168,27 +168,27 @@ const fetchFilesRecursive = async (FOLDER_ID, currentPath = 'root') => {
             const metaData = {
               name: file.name,
               relativePath: relativePath
-            }
+            };
 
             await processFilesAndUpload(result.filePath, ext, metaData);
             await deleteFile(result.filePath);
           }
-        })
+        });
       }
     };
       
     pageToken = res.data.nextPageToken;
   } while (pageToken);
-}
+};
 
 const main = async () => {
-  await fetchFilesRecursive(FOLDER_ID, 'root')
+  await fetchFilesRecursive(FOLDER_ID, 'root');
 
   // wait for any remaining file uploads in the queue to finish
   while (limit.activeCount > 0 || limit.pendingCount > 0) {
     console.log(`Waiting for remaining tasks (Active: ${limit.activeCount}, Pending: ${limit.pendingCount})`);
     await new Promise(resolve => setTimeout(resolve, 2000));
   }
-}
+};
 
-main()
+main();

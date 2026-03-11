@@ -20,7 +20,11 @@ export default defineConfig([
     rules: {
       'no-unused-vars': ['error', { varsIgnorePattern: '^[A-Z_]' }],
       'indent': ['error', 2],
-      'camelcase': 'warn',
+      'camelcase': ['error', { 
+        'properties': 'never', 
+        'ignoreDestructuring': true,
+        'allow': ['vector_store_ids', 'max_num_results', 'file_id'] 
+      }],
       'eqeqeq': 'warn',
       'quotes': ['error', 'single'],
       'semi': ['error', 'always'],

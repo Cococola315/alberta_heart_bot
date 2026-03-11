@@ -6,7 +6,7 @@ const openai = new OpenAI({
 });
 
 const deleteFilesAfterDate = async () => {
-  console.log("Starting cleanup for files created after Jan 1, 2026...");
+  console.log('Starting cleanup for files created after Jan 1, 2026...');
   
   const cutoffDate = Math.floor(new Date('2026-01-01').getTime() / 1000);
   let deletedCount = 0;
@@ -29,7 +29,7 @@ const deleteFilesAfterDate = async () => {
 
     console.log(`--- Cleanup Complete | Deleted: ${deletedCount} ---`);
   } catch (err) {
-    console.error("Error:", err);
+    console.error('Error:', err);
   }
 };
 
