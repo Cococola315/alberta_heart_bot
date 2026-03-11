@@ -13,7 +13,7 @@ const openai = new OpenAI({
   apiKey: process.env.CHATGPT_API_KEY,
 })
 
-const ROOT_DIR = ""
+const ROOT_DIR = process.argv[2]
 
 // deletes file after upload
 const deleteFile = async (fileName) => {
@@ -86,7 +86,7 @@ const processFilesAndUpload = async (filePath, ext) => {
 }
 
 const navigateFolders = async (folderPath) => {
-  const entries = fs.readdirSync(folderPath, { withFileTypes: true })
+  const entries = await fs.promises.readdir(folderPath, { withFileTypes: true })
   
   // go into every subfolger
   for (const entry of entries) {
@@ -108,7 +108,7 @@ const navigateFolders = async (folderPath) => {
 }
 
 const main = async () => {
-  navigateFolders(ROOT_DIR)
+  await navigateFolders(ROOT_DIR)
 }
 
 main()

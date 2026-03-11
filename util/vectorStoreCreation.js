@@ -6,9 +6,11 @@ const openai = new OpenAI({
 })
 
 const main = async () => {
-  const vs = openai.vectorStores.create({
-    name: "ABH Info",
-    description: "Contains all Alberta Heart Bot information"
+  const date = new Intl.DateTimeFormat('en-CA').format(new Date());
+
+  const vs = await openai.vectorStores.create({
+    name: "ABH Info 1.1",
+    description: `Contains all Alberta Heart Bot information, created on ${date}.`
   })
 
   console.log(vs)
