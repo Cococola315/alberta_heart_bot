@@ -85,9 +85,8 @@ const processFilesAndUpload = async (filePath, ext, metaData) => {
 }
 
 // downloads file, returns the path to the downloaded file, and a randomized name for the file (since google drive files can have duplicate names)
-downloadFile = async (drive, file) => {
+const downloadFile = async (drive, file) => {
   const mt = file.mimeType // extensions basically
-  let downloadStream;
   let fileName = `${crypto.randomUUID()}`
 
   // check extenstion type
