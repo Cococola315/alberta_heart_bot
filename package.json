@@ -22,7 +22,7 @@
     "prepare": "husky"
   },
   "lint-staged": {
-    "**/*.js": "eslint --fix"
+    "**/*.js": "eslint --fix ."
   },
   "dependencies": {
     "discord.js": "^14.25.1",
