@@ -23,7 +23,7 @@ const askCommand = async (interaction) => {
   try {
     // make the request to openai and get the response
     const question = interaction.options.getString('question');
-    const response = await request(question);
+    const response = await request(question, interaction.user.id);
     console.log(response);
     console.log('Used tokens:', response.usage.total_tokens);
     console.log('Total cost: $', 

@@ -42,3 +42,15 @@ for (const file of eventFiles) {
 }
 
 client.login(process.env.DISCORD_TOKEN);
+
+// mongodb connection
+const url = process.env.MONGODB_URI;
+console.log('connecting to MongoDB');
+(async () => {
+  try {
+    await mongoose.connect(url);
+    console.log('connected to MongoDB');
+  } catch (error) {
+    console.log('error connecting to MongoDB:', error.message);
+  }
+})();
